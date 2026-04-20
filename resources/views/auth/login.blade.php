@@ -8,7 +8,7 @@
 
             {{-- PANEL KIRI: BRANDING & VISUAL --}}
             <div class="col-md-5 d-none d-md-flex flex-column justify-content-center align-items-center p-5 text-white text-center"
-                style="background: linear-gradient(135deg, #88d3ce 0%, #6ebfb9 100%);">
+                style="background-color: #0066ff;">
                 <div class="mb-4">
                     <i class="bi bi-shield-lock-fill" style="font-size: 5rem;"></i>
                 </div>
@@ -74,7 +74,7 @@
                         <div class="mb-4">
                             <div class="d-flex justify-content-between">
                                 <label for="password" class="form-label fw-bold small text-muted uppercase letter-spacing-1">PASSWORD</label>
-                                <a href="#" class="text-decoration-none small" style="color: var(--primary-soft);">Lupa Password?</a>
+                                <a href="#" class="text-decoration-none small" style="color: #0066ff;">Lupa Password?</a>
                             </div>
                             <div class="input-group">
                                 <span class="input-group-text border-0 bg-light px-3 text-muted">
@@ -100,7 +100,7 @@
                         </div>
 
                         <div class="d-grid mb-4">
-                            <button type="submit" class="btn btn-primary btn-lg py-3 shadow-sm border-0 fw-bold" style="background-color: var(--primary-soft);">
+                            <button type="submit" class="btn text-white btn-lg py-3 shadow-sm border-0 fw-bold" style="background-color: #0066ff;">
                                 Masuk Sekarang <i class="bi bi-arrow-right ms-2"></i>
                             </button>
                         </div>
@@ -178,13 +178,13 @@
 
     <style>
         body { background-color: #f4f7f6; min-height: 100vh; display: flex; align-items: center; }
-        .form-control:focus { background-color: #fff !important; box-shadow: 0 0 0 0.25rem rgba(110, 191, 185, 0.25); border: 1px solid var(--primary-soft) !important; }
+        .form-control:focus { background-color: #fff !important; box-shadow: 0 0 0 0.25rem rgba(0, 102, 255, 0.25); border: 1px solid #0066ff !important; }
         .input-group-text { border-radius: 12px 0 0 12px; }
         .form-control { border-radius: 0; }
         .rounded-end-3 { border-radius: 0 12px 12px 0 !important; }
         .letter-spacing-1 { letter-spacing: 1px; }
         .uppercase { text-transform: uppercase; }
-        .custom-checkbox:checked { background-color: var(--primary-soft); border-color: var(--primary-soft); }
+        .custom-checkbox:checked { background-color: #0066ff; border-color: #0066ff; }
         pre { font-size: 0.75rem; line-height: 1.4; }
         table code { color: #d63384; }
     </style>
