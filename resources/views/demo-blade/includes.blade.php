@@ -37,7 +37,7 @@
                         @php $demoMessage = 'Ini pesan dari parent view!'; @endphp
                         
                         {{-- Include partial dengan data --}}
-                        @include('partials.flash-messages')
+                        @include('partials.flash-message')
                         
                         <p class="mb-0 text-success">
                             <i class="bi bi-check"></i> Flash messages partial berhasil di-include

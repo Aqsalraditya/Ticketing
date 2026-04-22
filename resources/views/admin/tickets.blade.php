@@ -134,7 +134,7 @@
                                     <div class="modal fade" id="assignModal{{ $ticket->id }}" tabindex="-1">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
-                                                <form action="{{ route('admin.tickets.assign', $ticket) }}" method="POST">
+                                                <form action="{{ route('admin.assign-ticket-action', $ticket) }}" method="POST">
                                                     @csrf
                                                     <div class="modal-header">
                                                         <h5 class="modal-title">Assign Ticket #{{ $ticket->id }}</h5>
