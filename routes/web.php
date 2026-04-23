@@ -15,9 +15,13 @@ use App\Http\Controllers\CsrfLabController;
 use App\Http\Controllers\SqliLabController;
 use App\Http\Controllers\AdminController;
 
-// Tambahan Controller untuk BAC / IDOR Lab
+// Controller Lab BAC / IDOR
 use App\Http\Controllers\Lab\SecureController;
 use App\Http\Controllers\Lab\VulnerableController;
+
+// Controller File Upload Lab
+use App\Http\Controllers\FileUpload\SecureUploadController;
+use App\Http\Controllers\FileUpload\VulnerableUploadController;
 
 // ============================================
 // BASIC ROUTES
@@ -72,9 +76,6 @@ Route::prefix('validation-lab')->name('validation-lab.')->group(function () {
     Route::post('/secure/clear', [ValidationLabController::class, 'secureClear'])->name('secure.clear');
 });
 
-// API Demo (Vulnerable Validation)
-Route::post('/api/vulnerable-submit', [ValidationLabController::class, 'apiVulnerable'])->withoutMiddleware(['web']);
-
 // CSRF Lab
 Route::prefix('csrf-lab')->name('csrf-lab.')->group(function () {
     Route::get('/', [CsrfLabController::class, 'index'])->name('index');
@@ -106,62 +107,31 @@ Route::prefix('sqli-lab')->name('sqli-lab.')->group(function () {
     Route::get('/reset-data', [SqliLabController::class, 'resetData'])->name('reset');
 });
 
-// Security Testing
-Route::prefix('security-testing')->name('security-testing.')->group(function () {
-    Route::get('/', [SecurityTestController::class, 'index'])->name('index');
-    Route::get('/xss', [SecurityTestController::class, 'xssTest'])->name('xss');
-    Route::get('/csrf', [SecurityTestController::class, 'csrfTest'])->name('csrf');
-    Route::post('/csrf', [SecurityTestController::class, 'csrfTestPost'])->name('csrf.post');
-    Route::get('/headers', [SecurityTestController::class, 'headersTest'])->name('headers');
-    Route::get('/audit-checklist', [SecurityTestController::class, 'auditChecklist'])->name('audit');
-});
-
 // ============================================================================
 // AUTH LAB & AUTHORIZATION PAGES
 // ============================================================================
 Route::prefix('auth-lab')->name('auth-lab.')->group(function () {
-    Route::get('/', function () {
-        return view('auth-lab.index');
-    })->name('index');
-    Route::get('/comparison', function () {
-        return view('auth-lab.comparison');
-    })->name('comparison');
+    Route::get('/', function () { return view('auth-lab.index'); })->name('index');
+    Route::get('/comparison', function () { return view('auth-lab.comparison'); })->name('comparison');
 });
 
 Route::prefix('authorization-lab')->name('authorization-lab.')->group(function () {
-    Route::get('/', function () {
-        return view('authorization-lab.index');
-    })->name('index');
-    Route::get('/login', function () {
-        return view('authorization-lab.login');
-    })->name('login');
-    Route::get('/implementation', function () {
-        return view('authorization-lab.implementation');
-    })->name('implementation');
+    Route::get('/', function () { return view('authorization-lab.index'); })->name('index');
+    Route::get('/login', function () { return view('authorization-lab.login'); })->name('login');
+    Route::get('/implementation', function () { return view('authorization-lab.implementation'); })->name('implementation');
 });
 
 // ============================================================================
-// BAC/IDOR LAB (Broken Access Control) - NEW ROUTES
+// BAC/IDOR LAB (Broken Access Control)
 // ============================================================================
 Route::prefix('bac-lab')->name('bac-lab.')->group(function () {
-    // Public routes (tidak perlu login)
-    Route::get('/', function () {
-        return view('bac-lab.index');
-    })->name('home');
-    Route::get('/comparison', function () {
-        return view('bac-lab.comparison');
-    })->name('comparison');
-    Route::get('/vulnerable/login', function () {
-        return view('bac-lab.vulnerable.login');
-    })->name('vulnerable.login');
-    Route::get('/secure/login', function () {
-        return view('bac-lab.secure.login');
-    })->name('secure.login');
+    Route::get('/', function () { return view('bac-lab.index'); })->name('home');
+    Route::get('/comparison', function () { return view('bac-lab.comparison'); })->name('comparison');
+    Route::get('/vulnerable/login', function () { return view('bac-lab.vulnerable.login'); })->name('vulnerable.login');
+    Route::get('/secure/login', function () { return view('bac-lab.secure.login'); })->name('secure.login');
 });
 
-// Protected routes (perlu login)
 Route::middleware('auth')->prefix('bac-lab')->name('bac-lab.')->group(function () {
-    // Vulnerable Version (IDOR Demo)
     Route::prefix('vulnerable')->name('vulnerable.')->group(function () {
         Route::get('/tickets', [VulnerableController::class, 'index'])->name('tickets.index');
         Route::get('/tickets/{id}', [VulnerableController::class, 'show'])->name('tickets.show');
@@ -169,15 +139,63 @@ Route::middleware('auth')->prefix('bac-lab')->name('bac-lab.')->group(function (
         Route::put('/tickets/{id}', [VulnerableController::class, 'update'])->name('tickets.update');
         Route::delete('/tickets/{id}', [VulnerableController::class, 'destroy'])->name('tickets.destroy');
     });
-
-    // Secure Version (dengan Policy)
     Route::prefix('secure')->name('secure.')->group(function () {
         Route::resource('tickets', SecureController::class)->parameters(['tickets' => 'ticket']);
     });
 });
 
 // ============================================================================
-// SECURE APP CORE (TICKETS, DASHBOARD, COMMENTS)
+// FILE UPLOAD LAB (Minggu 5 Hari 3 & 4) - NEWLY ADDED
+// ============================================================================
+Route::prefix('file-upload-lab')->name('file-upload-lab.')->group(function () {
+    Route::get('/', function () { return view('file-upload-lab.index'); })->name('index');
+    
+    Route::get('/overview/{section?}', function ($section = 'logging') {
+        $validSections = ['logging', 'upload-basics'];
+        if (!in_array($section, $validSections)) $section = 'logging';
+        return view('file-upload-lab.overview', compact('section'));
+    })->name('overview');
+
+    // Vulnerable Version
+    Route::prefix('vulnerable')->name('vulnerable.')->group(function () {
+        Route::get('/', [VulnerableUploadController::class, 'index'])->name('index');
+        Route::match(['get', 'post'], '/level1', [VulnerableUploadController::class, 'level1'])->name('level1');
+        Route::match(['get', 'post'], '/level2', [VulnerableUploadController::class, 'level2'])->name('level2');
+        Route::match(['get', 'post'], '/level3', [VulnerableUploadController::class, 'level3'])->name('level3');
+        Route::match(['get', 'post'], '/level4', [VulnerableUploadController::class, 'level4'])->name('level4');
+        Route::match(['get', 'post'], '/level5', [VulnerableUploadController::class, 'level5'])->name('level5');
+        Route::get('/files', [VulnerableUploadController::class, 'listFiles'])->name('files');
+        Route::delete('/clear', [VulnerableUploadController::class, 'clearUploads'])->name('clear');
+    });
+
+    // Secure Version
+    Route::prefix('secure')->name('secure.')->group(function () {
+        Route::get('/', [SecureUploadController::class, 'index'])->name('index');
+        Route::post('/upload', [SecureUploadController::class, 'upload'])->name('upload');
+        Route::get('/file/{filename}', [SecureUploadController::class, 'serve'])->name('serve');
+        Route::get('/download/{filename}', [SecureUploadController::class, 'download'])->name('download');
+        Route::delete('/file/{filename}', [SecureUploadController::class, 'delete'])->name('delete');
+        Route::delete('/clear', [SecureUploadController::class, 'clearAll'])->name('clear');
+    });
+});
+
+// ============================================================================
+// TOOLS & TESTING
+// ============================================================================
+// Security Testing
+Route::prefix('security-testing')->name('security-testing.')->group(function () {
+    Route::get('/', [SecurityTestController::class, 'index'])->name('index');
+    Route::get('/xss', [SecurityTestController::class, 'xssTest'])->name('xss');
+    Route::get('/csrf', [SecurityTestController::class, 'csrfTest'])->name('csrf');
+    Route::post('/csrf', [SecurityTestController::class, 'csrfTestPost'])->name('csrf.post');
+    Route::get('/headers', [SecurityTestController::class, 'headersTest'])->name('headers');
+    
+    // UBAH BAGIAN INI: Pastikan ->name('audit') agar menjadi 'security-testing.audit'
+    Route::get('/audit-checklist', [SecurityTestController::class, 'auditChecklist'])->name('audit');
+});
+
+// ============================================================================
+// SECURE APP CORE
 // ============================================================================
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -188,17 +206,10 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
-    Route::get('/dashboard', function () {
-        return view('auth.dashboard');
-    })->name('dashboard');
-
-    // Tickets Resource & Additional Actions
+    Route::get('/dashboard', function () { return view('auth.dashboard'); })->name('dashboard');
     Route::resource('tickets', TicketController::class);
     Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])->name('tickets.update-status');
     Route::patch('/tickets/{ticket}/assign', [TicketController::class, 'assign'])->name('tickets.assign');
-
-    // Comments
     Route::post('/tickets/{ticket}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
     Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
@@ -214,9 +225,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/tickets/{ticket}/assign', [AdminController::class, 'assignTicket'])->name('assign-ticket-action');
 });
 
-Route::get('/reports', [AdminController::class, 'reports'])
-    ->middleware(['auth', 'role:staff,admin'])
-    ->name('admin.reports');
+Route::get('/reports', [AdminController::class, 'reports'])->middleware(['auth', 'role:staff,admin'])->name('admin.reports');
 
 // ============================================================================
 // VULNERABLE AUTH LAB (DEMO ONLY)
@@ -235,6 +244,6 @@ Route::prefix('vulnerable')->name('vulnerable.')->group(function () {
     Route::get('/brute-force-stats', [VulnerableLoginController::class, 'bruteForceStats'])->name('brute-force-stats');
 });
 
-    Route::get('/error-handling-demo', function () {
-        return view('error-handling-demo.index');
-    })->name('error-handling-demo');
+Route::get('/error-handling-demo', function () {
+    return view('error-handling-demo.index');
+})->name('error-handling-demo');
